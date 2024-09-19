@@ -16,15 +16,23 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   int happinessLevel = 50;
   int hungerLevel = 50;
   Color petColor = Colors.yellow; // Initial color for "Neutral" mood
+  String petMood = "Neutral"; // Initial mood
+  String petMoodEmoji = "😐"; // Initial emoji for neutral mood
 
-  // Function to update the pet's color based on happiness level
+  // Function to update the pet's color and mood based on happiness level
   void _updatePetAppearance() {
     if (happinessLevel > 70) {
       petColor = Colors.green; // Happy
+      petMood = "Happy";
+      petMoodEmoji = "😄";
     } else if (happinessLevel >= 30 && happinessLevel <= 70) {
       petColor = Colors.yellow; // Neutral
+      petMood = "Neutral";
+      petMoodEmoji = "😐";
     } else {
       petColor = Colors.red; // Unhappy
+      petMood = "Unhappy";
+      petMoodEmoji = "😢";
     }
   }
 
@@ -79,7 +87,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
               style: TextStyle(fontSize: 20.0),
             ),
             SizedBox(height: 16.0),
-            // Display pet's happiness with color change
+            // Display pet's happiness with color change and mood indicator
             Container(
               height: 100,
               width: 100,
@@ -87,6 +95,12 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
                 color: petColor, // Color of the pet based on happiness
                 shape: BoxShape.circle,
               ),
+            ),
+            SizedBox(height: 8.0),
+            // Display the pet's mood and emoji
+            Text(
+              '$petMood $petMoodEmoji',
+              style: TextStyle(fontSize: 24.0),
             ),
             SizedBox(height: 16.0),
             Text(
