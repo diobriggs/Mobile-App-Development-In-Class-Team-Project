@@ -15,12 +15,25 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   String petName = "Your Pet";
   int happinessLevel = 50;
   int hungerLevel = 50;
+  Color petColor = Colors.yellow; // Initial color for "Neutral" mood
+
+  // Function to update the pet's color based on happiness level
+  void _updatePetAppearance() {
+    if (happinessLevel > 70) {
+      petColor = Colors.green; // Happy
+    } else if (happinessLevel >= 30 && happinessLevel <= 70) {
+      petColor = Colors.yellow; // Neutral
+    } else {
+      petColor = Colors.red; // Unhappy
+    }
+  }
 
   // Function to increase happiness and update hunger when playing with the pet
   void _playWithPet() {
     setState(() {
       happinessLevel = (happinessLevel + 10).clamp(0, 100);
       _updateHunger();
+      _updatePetAppearance(); // Update appearance based on new happiness level
     });
   }
 
@@ -29,6 +42,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     setState(() {
       hungerLevel = (hungerLevel - 10).clamp(0, 100);
       _updateHappiness();
+      _updatePetAppearance(); // Update appearance based on new happiness level
     });
   }
 
@@ -63,6 +77,16 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
             Text(
               'Name: $petName',
               style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(height: 16.0),
+            // Display pet's happiness with color change
+            Container(
+              height: 100,
+              width: 100,
+              decoration: BoxDecoration(
+                color: petColor, // Color of the pet based on happiness
+                shape: BoxShape.circle,
+              ),
             ),
             SizedBox(height: 16.0),
             Text(
