@@ -20,8 +20,10 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   String petMood = "Neutral"; // Initial mood
   String petMoodEmoji = "😐"; // Initial emoji for neutral mood
   bool isNameSet = false; // Track if the pet's name is set
+  bool gameOver = false; // Track if the game is over
   TextEditingController _nameController = TextEditingController();
   Timer? _hungerTimer; // Timer for increasing hunger automatically
+  Timer? _winTimer; // Timer for tracking win condition
 
   @override
   void initState() {
@@ -32,8 +34,9 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
 
   @override
   void dispose() {
-    // Cancel the timer when the widget is disposed
+    // Cancel the timers when the widget is disposed
     _hungerTimer?.cancel();
+    _winTimer?.cancel();
     super.dispose();
   }
 
@@ -55,21 +58,97 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     _updatePetAppearance();
   }
 
+  // Function to start win condition timer
+  void _startWinConditionTimer() {
+    _winTimer = Timer(Duration(minutes: 3), () {
+      setState(() {
+        _showWinDialog();
+      });
+    });
+  }
+
   // Function to update the pet's color and mood based on happiness level
   void _updatePetAppearance() {
-    if (happinessLevel > 70) {
+    if (happinessLevel > 80) {
       petColor = Colors.green; // Happy
       petMood = "Happy";
       petMoodEmoji = "😄";
-    } else if (happinessLevel >= 30 && happinessLevel <= 70) {
+      _checkWinCondition();
+    } else if (happinessLevel >= 30 && happinessLevel <= 80) {
       petColor = Colors.yellow; // Neutral
       petMood = "Neutral";
       petMoodEmoji = "😐";
+      _winTimer?.cancel(); // Stop win timer if happiness drops below 80
     } else {
       petColor = Colors.red; // Unhappy
       petMood = "Unhappy";
       petMoodEmoji = "😢";
+      _checkLossCondition();
     }
+  }
+
+  // Function to check win condition
+  void _checkWinCondition() {
+    if (_winTimer == null || !_winTimer!.isActive) {
+      _startWinConditionTimer(); // Start win timer if happiness > 80
+    }
+  }
+
+  // Function to check loss condition
+  void _checkLossCondition() {
+    if (hungerLevel >= 100 && happinessLevel <= 10) {
+      _showGameOverDialog();
+    }
+  }
+
+  // Function to display win dialog
+  void _showWinDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Congratulations!'),
+        content: Text('You kept your pet happy for 3 minutes!'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _resetGame();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to display game over dialog
+  void _showGameOverDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Game Over!'),
+        content: Text('Your pet is too hungry and unhappy.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _resetGame();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to reset the game after win/loss
+  void _resetGame() {
+    setState(() {
+      happinessLevel = 50;
+      hungerLevel = 50;
+      gameOver = false;
+      _winTimer?.cancel();
+    });
   }
 
   // Function to increase happiness and update hunger when playing with the pet
@@ -111,7 +190,8 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   // Function to set the pet's name
   void _setPetName() {
     setState(() {
-      petName = _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
+      petName =
+          _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
       isNameSet = true; // Name is set, now show the main screen
     });
   }
