@@ -16,15 +16,25 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   int happinessLevel = 50;
   int hungerLevel = 50;
   Color petColor = Colors.yellow; // Initial color for "Neutral" mood
+  String petMood = "Neutral"; // Initial mood
+  String petMoodEmoji = "😐"; // Initial emoji for neutral mood
+  bool isNameSet = false; // Track if the pet's name is set
+  TextEditingController _nameController = TextEditingController();
 
-  // Function to update the pet's color based on happiness level
+  // Function to update the pet's color and mood based on happiness level
   void _updatePetAppearance() {
     if (happinessLevel > 70) {
       petColor = Colors.green; // Happy
+      petMood = "Happy";
+      petMoodEmoji = "😄";
     } else if (happinessLevel >= 30 && happinessLevel <= 70) {
       petColor = Colors.yellow; // Neutral
+      petMood = "Neutral";
+      petMoodEmoji = "😐";
     } else {
       petColor = Colors.red; // Unhappy
+      petMood = "Unhappy";
+      petMoodEmoji = "😢";
     }
   }
 
@@ -64,6 +74,15 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     }
   }
 
+  // Function to set the pet's name
+  void _setPetName() {
+    setState(() {
+      petName =
+          _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
+      isNameSet = true; // Name is set, now show the main screen
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,45 +90,77 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
         title: Text('Digital Pet'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Name: $petName',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(height: 16.0),
-            // Display pet's happiness with color change
-            Container(
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                color: petColor, // Color of the pet based on happiness
-                shape: BoxShape.circle,
+        child: isNameSet
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Name: $petName',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  SizedBox(height: 16.0),
+                  // Display pet's happiness with color change and mood indicator
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: petColor, // Color of the pet based on happiness
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  // Display the pet's mood and emoji
+                  Text(
+                    '$petMood $petMoodEmoji',
+                    style: TextStyle(fontSize: 24.0),
+                  ),
+                  SizedBox(height: 16.0),
+                  Text(
+                    'Happiness Level: $happinessLevel',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  SizedBox(height: 16.0),
+                  Text(
+                    'Hunger Level: $hungerLevel',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  SizedBox(height: 32.0),
+                  ElevatedButton(
+                    onPressed: _playWithPet,
+                    child: Text('Play with Your Pet'),
+                  ),
+                  SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: _feedPet,
+                    child: Text('Feed Your Pet'),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Set a name for your pet:',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child: TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter pet name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: _setPetName,
+                    child: Text('Confirm Name'),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 16.0),
-            Text(
-              'Happiness Level: $happinessLevel',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(height: 16.0),
-            Text(
-              'Hunger Level: $hungerLevel',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: _playWithPet,
-              child: Text('Play with Your Pet'),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _feedPet,
-              child: Text('Feed Your Pet'),
-            ),
-          ],
-        ),
       ),
     );
   }
