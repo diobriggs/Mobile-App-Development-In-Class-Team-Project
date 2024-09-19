@@ -1,3 +1,4 @@
+import 'dart:async'; // Importing Timer
 import 'package:flutter/material.dart';
 
 void main() {
@@ -20,6 +21,39 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   String petMoodEmoji = "😐"; // Initial emoji for neutral mood
   bool isNameSet = false; // Track if the pet's name is set
   TextEditingController _nameController = TextEditingController();
+  Timer? _hungerTimer; // Timer for increasing hunger automatically
+
+  @override
+  void initState() {
+    super.initState();
+    // Start the hunger timer when the app starts
+    _startHungerTimer();
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed
+    _hungerTimer?.cancel();
+    super.dispose();
+  }
+
+  // Function to start the hunger timer
+  void _startHungerTimer() {
+    _hungerTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      setState(() {
+        _increaseHungerOverTime();
+      });
+    });
+  }
+
+  // Function to increase hunger automatically over time
+  void _increaseHungerOverTime() {
+    hungerLevel = (hungerLevel + 5).clamp(0, 100);
+    if (hungerLevel > 70) {
+      happinessLevel = (happinessLevel - 10).clamp(0, 100);
+    }
+    _updatePetAppearance();
+  }
 
   // Function to update the pet's color and mood based on happiness level
   void _updatePetAppearance() {
@@ -77,8 +111,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   // Function to set the pet's name
   void _setPetName() {
     setState(() {
-      petName =
-          _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
+      petName = _nameController.text.isNotEmpty ? _nameController.text : "Your Pet";
       isNameSet = true; // Name is set, now show the main screen
     });
   }
